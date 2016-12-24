@@ -2,10 +2,12 @@ mod cards;
 
 extern crate rand;
 
-use rand::Rand;
+// use rand::Rand;
 
 fn main() {
-	let rng = &mut rand::thread_rng();
-	println!("{:?}", cards::Card::rand(rng));
-
+    let mut counter = cards::Card::new();
+    for i in 0..1000 {
+        let x = counter.next().unwrap();
+        println!("{:?}", x);
+    }
 }

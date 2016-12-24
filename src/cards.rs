@@ -1,6 +1,8 @@
 extern crate rand;
 
+use std::iter;
 use rand::{Rand, Rng};
+
 
 macro_rules! count {
     () => { 0 };
@@ -17,7 +19,7 @@ macro_rules! randable_enum {
 
         impl $Name {
             fn values() -> [$Name; count!($($x),*)] {
-                use cards::$Name::*;
+                use self::$Name::*;
                 [$($x),*]
             }
         }
@@ -49,11 +51,36 @@ macro_rules! randable_struct {
     }
 }
 
-randable_struct! {
-	pub struct Card {
-		color: Color,
-		card_type: CardType,
-	}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Card {
+    color: Color,
+    card_type: CardType,
+}
+
+impl Card {
+    pub fn new() -> Card {
+        Card {
+            color: Color::Red,
+            card_type: CardType::Number(0),
+        }
+    }
+}
+
+impl Iterator for Card {
+    type Item = Card;
+
+    fn next(&mut self) -> Option<Card> {
+        use self::CardType::*;
+        match self.card_type {
+            Number(x) if x < 9 => self.card_type = Number(x + 1),
+            Number(9) => self.card_type = Reverse,
+            Reverse => self.card_type = Skip,
+            Skip => self.card_type = Plus2,
+            Plus2 => self.card_type = Number(0),
+            _ => return None,
+        }
+        Some(*self)
+    }
 }
 
 randable_enum! {
@@ -66,22 +93,12 @@ randable_enum! {
 	}
 }
 
-randable_enum! {
-	pub enum CardType {
-		One,
-		Two,
-		Three,
-		Four,
-		Five,
-		Six,
-		Seven,
-		Eight,
-		Nine,
-		Ten,
-		Skip,
-		Reverse,
-		Plus2,
-		Wild,
-		WildPlus4,
-	}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CardType {
+    Number(i32),
+    Reverse,
+    Skip,
+    Plus2,
+    Wild,
+    WildPlus4,
 }
