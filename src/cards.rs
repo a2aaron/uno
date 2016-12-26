@@ -1,3 +1,29 @@
+pub fn play_card(card: Card, mut deck: Vec<Card>) -> Option<Vec<Card>> {
+    let top_card: Card = deck[deck.len() - 1];
+
+    if playable_card(card, top_card) {
+        deck.push(card);
+        Some(deck)
+    } else {
+        None
+    }
+}
+
+pub fn playable_card(card: Card, onto: Card) -> bool {
+    use self::Color::*;
+    use self::CardType::*;
+    if card.color == Any {
+        true
+    } else if card.color == onto.color || card.card_type == onto.card_type {
+        true
+    } else {
+        match onto.card_type {
+            Wild(x) | WildPlus4(x) => card.color == x,
+            _ => false,
+        }
+    }
+}
+
 pub fn get_deck() -> [Card; 108] {
     let mut vec: Vec<Card> = Vec::new();
     let mut iter: Card = Card::new();
