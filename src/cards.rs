@@ -19,7 +19,7 @@ pub fn get_deck() -> [Card; 108] {
                         vec.push(card);
                         vec.push(card);
                     },
-                    Wild | WildPlus4 => {
+                    Wild(_) | WildPlus4(_) => {
                         vec.push(card);
                         vec.push(card);
                         vec.push(card);
@@ -30,10 +30,6 @@ pub fn get_deck() -> [Card; 108] {
             None => break,
         }
     }
-    to_array(&vec)
-}
-
-fn to_array(vec: &Vec<Card>) -> [Card; 108] {
     let mut arr = [Card::new(); 108];
     for i in 0..arr.len() {
         arr[i] = vec[i];
@@ -76,14 +72,14 @@ impl Iterator for Card {
                     Blue => self.color = Yellow,
                     Yellow => {
                         self.color = Any;
-                        self.card_type = Wild;
+                        self.card_type = Wild(Color::Any);
                     }
                     Any => self.color = Any,
                }
                
             }
-            Wild => self.card_type = WildPlus4,
-            WildPlus4 => return None,
+            Wild(_) => self.card_type = WildPlus4(Color::Any),
+            WildPlus4(_) => return None,
             _ => panic!(),
         }
         Some(*self)
@@ -96,7 +92,7 @@ pub enum Color {
 	Blue,
 	Red,
 	Yellow,
-	Any,
+    Any,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -105,6 +101,6 @@ pub enum CardType {
     Reverse,
     Skip,
     Plus2,
-    Wild,
-    WildPlus4,
+    Wild(Color),
+    WildPlus4(Color),
 }
