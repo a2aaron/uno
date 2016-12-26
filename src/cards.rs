@@ -1,53 +1,45 @@
-extern crate rand;
-
-use rand::{Rand, Rng};
-
-
-macro_rules! count {
-    () => { 0 };
-    ($x:expr) => { 1 };
-    ($x:expr, $($xs:expr),*) => { 1 + count!($($xs),*) }
-}
-
-macro_rules! randable_enum {
-    (pub enum $Name:ident { $($x:ident,)* }) => {
-        #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-        pub enum $Name {
-            $($x,)*
-        }
-
-        impl $Name {
-            fn values() -> [$Name; count!($($x),*)] {
-                use self::$Name::*;
-                [$($x),*]
-            }
-        }
-
-        impl Rand for $Name {
-            fn rand<R: Rng>(rng: &mut R) -> $Name {
-                $Name::values()[rng.gen_range(0, $Name::values().len())]
-            }
-        }
-    }
-}
-
-macro_rules! randable_struct {
-    (pub struct $Name:ident {
-         $($field_name:ident: $field_type:ty,)*
-     }) => {
-        #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-        pub struct $Name {
-            $($field_name: $field_type,)*
-        }
-
-        impl Rand for $Name {
-            fn rand<R: Rng>(rng: &mut R) -> $Name {
-                $Name {
-                    $($field_name: Rand::rand(rng),)*
+pub fn get_deck() -> [Card; 108] {
+    let mut vec: Vec<Card> = Vec::new();
+    let mut iter: Card = Card::new();
+    loop {
+        let card: Option<Card> = iter.next();
+        match card {
+            Some(card) => {
+                use self::CardType::*;
+                match card.card_type {
+                    Number(0) => {
+                        vec.push(card); 
+                    },
+                    Number(x) if x > 0 => {
+                        vec.push(card);
+                        vec.push(card);
+                    },
+                    Number(_) => panic!("{:?}", card.card_type),
+                    Reverse | Skip | Plus2 => {
+                        vec.push(card);
+                        vec.push(card);
+                    },
+                    Wild | WildPlus4 => {
+                        vec.push(card);
+                        vec.push(card);
+                        vec.push(card);
+                        vec.push(card);
+                    },
                 }
             }
+            None => break,
         }
     }
+    to_array(&vec)
+}
+
+fn to_array(vec: &Vec<Card>) -> [Card; 108] {
+    let mut arr = [Card::new(); 108];
+    for i in 0..arr.len() {
+        arr[i] = vec[i];
+    }
+
+    arr
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -98,14 +90,13 @@ impl Iterator for Card {
     }
 }
 
-randable_enum! {
-	pub enum Color {
-		Green,
-		Blue,
-		Red,
-		Yellow,
-		Any,
-	}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Color {
+	Green,
+	Blue,
+	Red,
+	Yellow,
+	Any,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

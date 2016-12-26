@@ -5,8 +5,10 @@ extern crate rand;
 // use rand::Rand;
 
 fn main() {
-    let counter = cards::Card::new();
-    for card in counter {
-        println!("{:?}", card);
-    }
+	use cards::Card;
+	let cards: [Card; 108] = cards::get_deck();
+	for card in cards.iter() {
+    	println!("{:?}", card);
+	}
+	println!("Done");
 }
