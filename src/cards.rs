@@ -1,6 +1,5 @@
 extern crate rand;
 
-use std::iter;
 use rand::{Rand, Rng};
 
 
@@ -61,7 +60,7 @@ impl Card {
     pub fn new() -> Card {
         Card {
             color: Color::Red,
-            card_type: CardType::Number(0),
+            card_type: CardType::Number(-1),
         }
     }
 }
@@ -76,8 +75,24 @@ impl Iterator for Card {
             Number(9) => self.card_type = Reverse,
             Reverse => self.card_type = Skip,
             Skip => self.card_type = Plus2,
-            Plus2 => self.card_type = Number(0),
-            _ => return None,
+            Plus2 => {
+               self.card_type = Number(0);
+               use self::Color::*;
+               match self.color {
+                    Red => self.color = Green,
+                    Green => self.color = Blue,
+                    Blue => self.color = Yellow,
+                    Yellow => {
+                        self.color = Any;
+                        self.card_type = Wild;
+                    }
+                    Any => self.color = Any,
+               }
+               
+            }
+            Wild => self.card_type = WildPlus4,
+            WildPlus4 => return None,
+            _ => panic!(),
         }
         Some(*self)
     }
