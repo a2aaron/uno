@@ -1,6 +1,7 @@
 mod cards;
+mod tests;
 
-extern crate rand;
+// extern crate rand;
 
 // use rand::Rand;
 

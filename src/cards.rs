@@ -66,8 +66,8 @@ pub fn get_deck() -> [Card; 108] {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Card {
-    color: Color,
-    card_type: CardType,
+    pub color: Color,
+    pub card_type: CardType,
 }
 
 impl Card {
@@ -75,6 +75,18 @@ impl Card {
         Card {
             color: Color::Red,
             card_type: CardType::Number(-1),
+        }
+    }
+
+    pub fn new_from(color: Color, card_type: CardType) -> Card {
+        use self::Color::*;
+        use self::CardType::*;
+        if color != Any && match card_type{Wild(_) | WildPlus4(_) => true, _ => false,} {
+            panic!("{:?} with {:?} is illegal", color, card_type);
+        }
+        Card {
+            color: color,
+            card_type: card_type,
         }
     }
 }
