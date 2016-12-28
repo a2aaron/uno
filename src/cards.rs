@@ -78,32 +78,30 @@ impl Card {
         }
     }
 
-    pub fn new_from(color: Color, card_type: CardType) -> Result<Card, & 'static str> {
-        use self::Color::*;
-        use self::CardType::*;
-        // match (color, card_type) {
-        //     (Any, Wild(_)) | (Any, WildPlus4(_)) => 
-        // }
-
-        // If color is Any XOR card type is Wild/WildPlus4, then we have an invalid card
-        if color == Any && match card_type{Wild(_) | WildPlus4(_) => false, _ => true,} {
-            return Err("Bad card")
-        }
-        if color != Any && match card_type{Wild(_) | WildPlus4(_) => true, _ => false,} {
-            return Err("Bad card")
-           // Err(format!("Cannot create card with {:?} and {:?}", color, card_type));
-        }
-
-        if let Number(x) = card_type {
-            if x > 9 || x < 0 {
-                return Err("Bad card")
-            }
-        }
-
-        Ok(Card {
+    fn new_from_any(color: Color, card_type: CardType) -> Card {
+        Card {
             color: color,
             card_type: card_type,
-        })
+        }
+    }
+
+    pub fn new_from(color: Color, card_type: CardType) -> Result<Card, & 'static str> {
+        /*
+        A card must satisfy the following rules
+        1. If it a wild card, then it's color must be Any
+        2. If it is not a wild card, then it's color must not be Any
+        3. If it is a number, then it must between 0 and 9 inclusive
+        4.
+        */
+        use self::Color::*;
+        use self::CardType::*;
+         match (color, card_type) {
+             (Any, Wild(_)) | (Any, WildPlus4(_)) => return Ok(Card::new_from_any(color, card_type)),
+             (_, Wild(_)) | (_, WildPlus4(_)) => return Err("Wild or WildPlus4 card must use Any color"),
+             (Any, _) => return Err("Any color must only be used with Wild or WildPlus4 cardtype"),
+             (_, Number(x)) if (x < 0 ||  x > 9) => return Err("Number cardtype must have value between one and ten"),
+             (_, _) => return Ok(Card::new_from_any(color, card_type)),
+         }
     }
 }
 

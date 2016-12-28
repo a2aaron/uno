@@ -70,7 +70,8 @@ mod tests {
 		panic_on_any_err!(
 			Card::new_from(Color::Any, CardType::Wild(Color::Any)),
 			Card::new_from(Color::Blue, CardType::Reverse),
-			Card::new_from(Color::Green, CardType::Number(6)),
+			Card::new_from(Color::Green, CardType::Number(9)),
+			Card::new_from(Color::Green, CardType::Number(0)),
 			Card::new_from(Color::Any, CardType::WildPlus4(Color::Green))
 		);
 	}
@@ -80,7 +81,8 @@ mod tests {
 		panic_on_any_ok!(
 			Card::new_from(Color::Red, CardType::Wild(Color::Any)),
 			Card::new_from(Color::Any, CardType::Number(2)),
-			Card::new_from(Color::Red, CardType::Number(-1))
+			Card::new_from(Color::Red, CardType::Number(-1)),
+			Card::new_from(Color::Red, CardType::Number(10))
 		);
 	}
 }
