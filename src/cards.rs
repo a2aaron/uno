@@ -40,7 +40,7 @@ pub fn get_deck() -> [Card; 108] {
                         vec.push(card);
                         vec.push(card);
                     },
-                    Number(_) => panic!("{:?}", card.card_type),
+                    Number(_) => unreachable!(),
                     Reverse | Skip | Plus2 => {
                         vec.push(card);
                         vec.push(card);
@@ -78,16 +78,32 @@ impl Card {
         }
     }
 
-    pub fn new_from(color: Color, card_type: CardType) -> Card {
+    pub fn new_from(color: Color, card_type: CardType) -> Result<Card, & 'static str> {
         use self::Color::*;
         use self::CardType::*;
-        if color != Any && match card_type{Wild(_) | WildPlus4(_) => true, _ => false,} {
-            panic!("{:?} with {:?} is illegal", color, card_type);
+        // match (color, card_type) {
+        //     (Any, Wild(_)) | (Any, WildPlus4(_)) => 
+        // }
+
+        // If color is Any XOR card type is Wild/WildPlus4, then we have an invalid card
+        if color == Any && match card_type{Wild(_) | WildPlus4(_) => false, _ => true,} {
+            return Err("Bad card")
         }
-        Card {
+        if color != Any && match card_type{Wild(_) | WildPlus4(_) => true, _ => false,} {
+            return Err("Bad card")
+           // Err(format!("Cannot create card with {:?} and {:?}", color, card_type));
+        }
+
+        if let Number(x) = card_type {
+            if x > 9 || x < 0 {
+                return Err("Bad card")
+            }
+        }
+
+        Ok(Card {
             color: color,
             card_type: card_type,
-        }
+        })
     }
 }
 
