@@ -71,7 +71,7 @@ mod tests {
 			Card::new_from(Color::Any, CardType::Wild(Color::Any)),
 			Card::new_from(Color::Blue, CardType::Reverse),
 			Card::new_from(Color::Green, CardType::Number(9)),
-			Card::new_from(Color::Green, CardType::Number(0)),
+			Card::new_from(Color::Red, CardType::Number(0)),
 			Card::new_from(Color::Any, CardType::WildPlus4(Color::Green))
 		);
 	}
@@ -84,5 +84,23 @@ mod tests {
 			Card::new_from(Color::Red, CardType::Number(-1)),
 			Card::new_from(Color::Red, CardType::Number(10))
 		);
+	}
+
+	#[test]
+	fn test_game_state() {
+		let mut game_state: GameState = GameState {
+ 	   		turn_order: TurnOrder::Normal,
+	    	current_player: 0,
+	    	players: Vec::new(),
+	    	draw_deck: Vec::new(),
+    		play_deck: Vec::new(),
+    	};
+
+	}
+
+	#[test]
+	fn test_new_game_state() {
+		let mut game_state: GameState = GameState::new_game();
+		assert!(game_state.draw_deck == get_deck())
 	}
 }
