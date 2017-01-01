@@ -76,7 +76,7 @@ impl GameState {
 
         game_state.shuffle();
         for i in 0..num_players {
-            for j in 0..STARTING_HAND_SIZE {
+            for _ in 0..STARTING_HAND_SIZE {
                 let card: Card = game_state.pop_draw_deck();
                 game_state.players.get_hand(i).push(card);
             }
@@ -100,6 +100,7 @@ impl GameState {
             Normal => self.turn_order = Reverse,
             Reverse => self.turn_order = Normal,
         }
+        self.next_player();
     }
 
     fn skip(&mut self) {
@@ -111,7 +112,7 @@ impl GameState {
         self.next_player();
         {
             let mut cards: Vec<Card> = Vec::new();
-            for i in 0..num_cards {
+            for _ in 0..num_cards {
                 cards.push(self.pop_draw_deck());
             }
             let this_hand: &mut Vec<Card> = self.players.get_current_player();
