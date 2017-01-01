@@ -147,7 +147,11 @@ impl GameState {
         rand::thread_rng().shuffle(&mut self.draw_deck.as_mut_slice());
     }
 
-    pub fn play_card(&mut self, card: &mut Card) -> Result<&mut GameState, Card> {
+    pub fn playable_card(&mut self, card: Card) -> bool {
+        return playable_card(card, self.top_card())
+    }
+
+    pub fn play_card(&mut self, card: &mut Card) -> &mut GameState {
         use cards::CardType::*;
         if playable_card(*card, self.top_card()) {
             self.play_deck.push(*card);
@@ -157,11 +161,11 @@ impl GameState {
                 Skip => self.skip(),
                 Plus2 => self.plus_n(2),
                 WildPlus4(_) => self.plus_n(4),
-                _ => {},
+                _ => self.next_player(),
             }
-            return Ok(self)
+            return self
         } else {
-            return Err(*card)
+            panic!()
         }
     }
 }

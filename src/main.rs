@@ -24,12 +24,12 @@ fn main() {
 		// Get card to play
 		let (mut card, index) = read_card_from_stdin(&mut game_state.players);
 		// Play the card
-		match game_state.play_card(&mut card) {
-			Err(card) => println!("Cannot play {:?}", card),
-			Ok(game_state) => {
-				game_state.players.get_current_player().remove(index);
-				game_state.next_player();
-			},	
+		if game_state.playable_card(card) {
+			game_state.players.get_current_player().remove(index);
+			game_state.play_card(&mut card);
+		}
+		else {
+			println!("Cannot play {:?}", card);
 		}
 	}
 }
