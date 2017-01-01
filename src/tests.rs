@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
 	use cards::*;
+	use game_state::*;
 
 	macro_rules! panic_on_err {
 		($result: expr) => {
@@ -63,6 +64,10 @@ mod tests {
 		let card = Card {color: Color::Red, card_type: CardType::Number(6)};
 		let onto = Card {color: Color::Blue, card_type: CardType::Skip};
 		assert!(!playable_card(card, onto));
+
+		let card = Card {color: Color::Red, card_type: CardType::Number(5)};
+		let onto = Card {color: Color::Any, card_type: CardType::Wild(Color::Red)};
+		assert!(playable_card(card, onto));
 	}
 
 	#[test]
@@ -90,17 +95,10 @@ mod tests {
 	fn test_game_state() {
 		let mut game_state: GameState = GameState {
  	   		turn_order: TurnOrder::Normal,
-	    	current_player: 0,
-	    	players: Vec::new(),
+	    	players: Players::new(0),
 	    	draw_deck: Vec::new(),
     		play_deck: Vec::new(),
     	};
 
-	}
-
-	#[test]
-	fn test_new_game_state() {
-		let mut game_state: GameState = GameState::new_game();
-		assert!(game_state.draw_deck == get_deck())
 	}
 }

@@ -1,20 +1,22 @@
 mod cards;
 mod tests;
+mod game_state;
 
 // extern crate rand;
 
 // use rand::Rand;
 
 use cards::*;
+use game_state::*;
 use std::io;
 
 fn main() {
-	use cards::Card;
 	let mut game_state: GameState = GameState::new(4);
+	println!("GameState::new OK");
 	// Main game loop
 	loop {
 		println!("Your turn player {}!", game_state.players.current_player);
-		println!("Top card is {:?}", game_state.play_deck.last());
+		println!("Top card is {:?}", game_state.top_card());
 		println!("Your hand");
 		for card in game_state.players.get_current_player() {
 			println!("{:?}", card);
@@ -25,18 +27,18 @@ fn main() {
 		match game_state.play_card(&mut card) {
 			Err(card) => println!("Cannot play {:?}", card),
 			Ok(game_state) => {
-				game_state.next_player();
 				game_state.players.get_current_player().remove(index);
+				game_state.next_player();
 			},	
 		}
 	}
 }
 
-fn read_color_from_stdin() -> cards::Color {
+fn read_color_from_stdin() -> Color {
 	loop {
 		println!("What color (R/G/Y/B)?");
 		let mut input = String::new();
-		let result = io::stdin().read_line(&mut input);
+		io::stdin().read_line(&mut input).unwrap();
 		input.pop(); // Remove trailing newline
 		use cards::Color::*;
 		match input.as_ref() {
@@ -60,7 +62,8 @@ fn read_card_from_stdin<'a>(players:&'a mut Players) -> (Card, usize) {
 				// If wild, ask for color
 				use cards::CardType::*;
 				match x.card_type {
-					Wild(mut color) | WildPlus4(mut color) => color = read_color_from_stdin(),
+					Wild(_) => x.card_type = Wild(read_color_from_stdin()),
+					WildPlus4(_) => x.card_type = WildPlus4(read_color_from_stdin()),
 					_ => {},
 				}
 				return (*x, card_index);
@@ -73,17 +76,11 @@ fn read_i32_from_stdin(message: String) -> i32 {
 	println!("{}", message);
 	loop {
 		let mut input = String::new();
-		let result = io::stdin().read_line(&mut input);
+		io::stdin().read_line(&mut input).unwrap();
 		input.pop(); // Remove trailing newline
-		match result {
-			Ok(_) => {
-				match input.parse::<i32>() {
-					Ok(n) => return n,
-					Err(_) => println!("{:?} is not a number!", input),
-				}
-			}
-			Err(_) => panic!(),
+		match input.parse::<i32>() {
+			Ok(n) => return n,
+			Err(_) => println!("{:?} is not a number!", input),
 		}
 	}
-
 }
