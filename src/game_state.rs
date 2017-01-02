@@ -210,7 +210,7 @@ impl Players {
 
     pub fn previous_player(&mut self) {
         if self.current_player == 0 {
-            self.current_player = self.players.len();
+            self.current_player = self.players.len() - 1;
         } else {
             self.current_player = self.current_player - 1;
         }
