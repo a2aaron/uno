@@ -22,16 +22,29 @@ fn main() {
 			println!("{:?}", card);
 		}
 		// Get card to play
-		let (mut card, index) = read_card_from_stdin(&mut game_state.players);
+		let action: Action = read_action_from_stdin(&mut game_state.players);
+		match action {
+			Action::Play(mut card, index) => {
+				if game_state.playable_card(card) {
+					game_state.players.get_current_player().remove(index);
+					game_state.play_card(&mut card);
+				}
+				else {
+					println!("Cannot play {:?}", card);
+				}
+			},
+			Action::Draw => {
+				game_state.draw_card()
+			}
+		}
 		// Play the card
-		if game_state.playable_card(card) {
-			game_state.players.get_current_player().remove(index);
-			game_state.play_card(&mut card);
-		}
-		else {
-			println!("Cannot play {:?}", card);
-		}
+		
 	}
+}
+
+enum Action {
+	Play(Card, usize),
+	Draw,
 }
 
 fn read_color_from_stdin() -> Color {
@@ -51,36 +64,42 @@ fn read_color_from_stdin() -> Color {
 	}
 }
 
-fn read_card_from_stdin<'a>(players:&'a mut Players) -> (Card, usize) {
-	let mut card_index: usize;
+fn read_action_from_stdin<'a>(players:&'a mut Players) -> Action {
 	loop {
-		// Minus 1 because humans are 1-indexed
-		card_index = (read_i32_from_stdin("Pick a card...".to_owned()) - 1) as usize;
-		match players.get_from_current_player(card_index) {
-			None => println!("Card does not exist!"),
-			Some(x) => {
-				// If wild, ask for color
-				use cards::CardType::*;
-				match x.card_type {
-					Wild(_) => x.card_type = Wild(read_color_from_stdin()),
-					WildPlus4(_) => x.card_type = WildPlus4(read_color_from_stdin()),
-					_ => {},
-				}
-				return (*x, card_index);
-			},		
+		let input = read_string_from_stdin("Pick a card...".to_owned());
+		if let Ok(n) = input.parse::<usize>() {
+			if n == 0 {
+				println!("Card does not exist!");
+				continue;
+			}
+			
+			// Minus 1 because humans are 1-indexed
+			let card_index: usize = n - 1 as usize;
+			match players.get_from_current_player(card_index) {
+				None => println!("Card does not exist!"),
+				Some(x) => {
+					// If wild, ask for color
+					use cards::CardType::*;
+					match x.card_type {
+						Wild(_) => x.card_type = Wild(read_color_from_stdin()),
+						WildPlus4(_) => x.card_type = WildPlus4(read_color_from_stdin()),
+						_ => {},
+					}
+					return Action::Play(*x, card_index);
+				},
+			}	
+		} else if input == "pass" || input == "p" {
+			return Action::Draw;
+		} else {
+			println!("{:?} is not valid!", input);
 		}
 	}
 }
 
-fn read_i32_from_stdin(message: String) -> i32 {
+fn read_string_from_stdin(message: String) -> String {
 	println!("{}", message);
-	loop {
-		let mut input = String::new();
-		io::stdin().read_line(&mut input).unwrap();
-		input.pop(); // Remove trailing newline
-		match input.parse::<i32>() {
-			Ok(n) => return n,
-			Err(_) => println!("{:?} is not a number!", input),
-		}
-	}
+	let mut input = String::new();
+	io::stdin().read_line(&mut input).unwrap();
+	input.pop(); // Remove trailing newline
+	input
 }

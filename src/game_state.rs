@@ -152,6 +152,12 @@ impl GameState {
         return playable_card(card, self.top_card())
     }
 
+    pub fn draw_card(&mut self) {
+        let card: Card = self.pop_draw_deck();
+        self.players.get_current_player().push(card);
+        self.next_player();
+    }
+
     pub fn play_card(&mut self, card: &mut Card) -> &mut GameState {
         use cards::CardType::*;
         if playable_card(*card, self.top_card()) {
