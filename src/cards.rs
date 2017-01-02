@@ -15,9 +15,9 @@ impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use cards::CardType::*;
         match self.card_type {
-            Wild(x) => return write!(f, "{}", Color::print_in_color("Wild".to_string(), x)),
-            WildPlus4(x) => return write!(f, "{}", Color::print_in_color("Wild Plus 4".to_string(), x)),
-            _ => return write!(f, "{} {}", self.color, self.card_type)
+            Wild(x) => return write!(f, "{}", print_in_color("Wild".to_string(), x)),
+            WildPlus4(x) => return write!(f, "{}", print_in_color("Wild Plus 4".to_string(), x)),
+            _ => return write!(f, "{}", print_in_color(format!("{} {}", self.color, self.card_type), self.color)),
         }
     }
 }
@@ -98,17 +98,15 @@ pub enum Color {
     Any,
 }
 
-impl Color {
-    fn print_in_color(string: String, color: self::Color) -> term::Painted<String> {
-        use cards::Color::*;
-        use self::term::Color as T_Color;
-        match color {
-            Green => return T_Color::Green.paint(string),
-            Blue => return T_Color::Blue.paint(string),
-            Red => return T_Color::Red.paint(string),
-            Yellow => return T_Color::Yellow.paint(string),
-            Any =>  return T_Color::White.paint(string),
-        }
+fn print_in_color(string: String, color: self::Color) -> term::Painted<String> {
+    use cards::Color::*;
+    use self::term::Color as T_Color;
+    match color {
+        Green => return T_Color::Green.paint(string),
+        Blue => return T_Color::Blue.paint(string),
+        Red => return T_Color::Red.paint(string),
+        Yellow => return T_Color::Yellow.paint(string),
+        Any =>  return T_Color::White.paint(string),
     }
 }
 

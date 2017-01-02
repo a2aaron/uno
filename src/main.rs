@@ -27,6 +27,9 @@ fn main() {
 			Action::Play(mut card, index) => {
 				if game_state.playable_card(card) {
 					game_state.players.get_current_player().remove(index);
+					if game_state.players.get_current_player().len() == 0 {
+						break;
+					}
 					game_state.play_card(&mut card);
 				}
 				else {
@@ -36,10 +39,6 @@ fn main() {
 			Action::Draw => {
 				game_state.draw_card()
 			}
-		}
-
-		if game_state.players.get_current_player().len() == 0 {
-			break;
 		}
 	}
 

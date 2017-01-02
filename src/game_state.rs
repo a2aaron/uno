@@ -74,14 +74,23 @@ impl GameState {
         };
 
         game_state.shuffle();
+
+        // Deal cards
         for i in 0..num_players {
             for _ in 0..STARTING_HAND_SIZE {
                 let card: Card = game_state.pop_draw_deck();
                 game_state.players.get_hand(i).push(card);
             }
         }
-        let card: Card = game_state.pop_draw_deck();
-        game_state.play_deck.push(card);
+
+        // Make sure top card is not a wild card
+        loop {
+            let card: Card = game_state.pop_draw_deck();
+            game_state.play_deck.push(card);
+            if game_state.top_card().color != Color::Any {
+                break;
+            }
+        }
         game_state
     }
 
