@@ -11,12 +11,34 @@ use game_state::*;
 use std::io;
 
 fn main() {
-	let mut game_state: GameState = GameState::new(4);
-	println!("GameState::new OK");
+	let mut num_players: usize = 4;
+	println!("Welcome to Uno!");
+	println!("Type \"start\" to play. Type a number to set number of players (Currently {})", num_players);
+
+	loop {
+		let menu_nav: String = read_string_from_stdin(None).to_lowercase();
+		if menu_nav == "start" {
+			break;
+		} else if let Ok(n) = menu_nav.parse::<i32>() {
+			if n <= 0 {
+				println!("Must have at least one player");
+			}
+			else {
+				num_players = n as usize;
+				println!("Number of players is now {}", num_players);
+			}
+		} else {
+			println!("Command not recoginized");
+		}
+	}
+
+	println!("Uno game start! (Number of players: {})", num_players);
+	let mut game_state: GameState = GameState::new(num_players);
+
 	// Main game loop
 	loop {
-		println!("Your turn player {}!", game_state.players.current_player);
 		println!("Top card is {}", game_state.top_card());
+		println!("Your turn player {}!", game_state.players.current_player + 1);
 		println!("Your hand");
 		for (i, card) in game_state.players.get_current_player().iter().enumerate() {
 			println!("[{}]: {}", i + 1, card);
@@ -42,7 +64,7 @@ fn main() {
 		}
 	}
 
-	println!("You win player {}", game_state.players.current_player);
+	println!("You win player {}!", game_state.players.current_player + 1);
 }
 
 enum Action {
@@ -69,7 +91,7 @@ fn read_color_from_stdin() -> Color {
 
 fn read_action_from_stdin<'a>(players:&'a mut Players) -> Action {
 	loop {
-		let input = read_string_from_stdin("Pick a card...".to_owned());
+		let input = read_string_from_stdin(Some("Pick a card...".to_owned()));
 		if let Ok(n) = input.parse::<usize>() {
 			if n == 0 {
 				println!("Card does not exist!");
@@ -99,8 +121,10 @@ fn read_action_from_stdin<'a>(players:&'a mut Players) -> Action {
 	}
 }
 
-fn read_string_from_stdin(message: String) -> String {
-	println!("{}", message);
+fn read_string_from_stdin(message: Option<String>) -> String {
+	if let Some(x) = message {
+		println!("{}", x);
+	}
 	let mut input = String::new();
 	io::stdin().read_line(&mut input).unwrap();
 	input.pop(); // Remove trailing newline
