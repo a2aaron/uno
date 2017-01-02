@@ -13,7 +13,6 @@ pub fn playable_card(card: Card, onto: Card) -> bool {
         match onto.card_type {
             Wild(x) | WildPlus4(x) => return card.color == x,
             _ => {
-                println!("cannot play {:?} onto {:?}", card, onto);
                 return false
             },
         }
@@ -162,7 +161,6 @@ impl GameState {
         use cards::CardType::*;
         if playable_card(*card, self.top_card()) {
             self.play_deck.push(*card);
-            println!("pushed {:?}", card);
             match card.card_type {
                 Reverse => self.reverse(),
                 Skip => self.skip(),

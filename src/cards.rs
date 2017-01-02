@@ -1,9 +1,25 @@
 extern crate rand;
 
+use std::fmt;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Card {
     pub color: Color,
     pub card_type: CardType,
+}
+
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use cards::CardType::*;
+        match self.card_type {
+            Wild(Color::Any) => return write!(f, "Wild"),
+            Wild(_) => return write!(f, "Wild ({})", self.color),
+            WildPlus4(Color::Any) => return write!(f, "Wild Plus 4"),
+            WildPlus4(_) => return write!(f, "Wild Plus 4 ({})", self.color),
+
+            _ => return write!(f, "{} {}", self.color, self.card_type)
+        }
+    }
 }
 
 impl Card {
@@ -82,6 +98,19 @@ pub enum Color {
     Any,
 }
 
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use cards::Color::*;
+        match *self {
+            Green => return write!(f, "Green"),
+            Blue => return write!(f, "Blue"),
+            Red => return write!(f, "Red"),
+            Yellow => return write!(f, "Yellow"),
+            Any => return write!(f, "Any")
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CardType {
     Number(i32),
@@ -90,4 +119,18 @@ pub enum CardType {
     Plus2,
     Wild(Color),
     WildPlus4(Color),
+}
+
+impl fmt::Display for CardType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use cards::CardType::*;
+        match *self {
+            Number(x) => return write!(f, "{}", x),
+            Reverse => return write!(f, "Reverse"),
+            Skip => return write!(f, "Skip"),
+            Plus2 => return write!(f, "Plus 2"),
+            Wild(x) => return write!(f, "Wild Card ({})", x),
+            WildPlus4(x) => return write!(f, "Wild Plus 4 ({})", x),
+        }
+    }
 }

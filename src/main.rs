@@ -16,10 +16,10 @@ fn main() {
 	// Main game loop
 	loop {
 		println!("Your turn player {}!", game_state.players.current_player);
-		println!("Top card is {:?}", game_state.top_card());
+		println!("Top card is {}", game_state.top_card());
 		println!("Your hand");
-		for card in game_state.players.get_current_player() {
-			println!("{:?}", card);
+		for (i, card) in game_state.players.get_current_player().iter().enumerate() {
+			println!("[{}]: {}", i + 1, card);
 		}
 		// Get card to play
 		let action: Action = read_action_from_stdin(&mut game_state.players);
@@ -30,16 +30,20 @@ fn main() {
 					game_state.play_card(&mut card);
 				}
 				else {
-					println!("Cannot play {:?}", card);
+					println!("Cannot play {} onto {}", card, game_state.top_card());
 				}
 			},
 			Action::Draw => {
 				game_state.draw_card()
 			}
 		}
-		// Play the card
-		
+
+		if game_state.players.get_current_player().len() == 0 {
+			break;
+		}
 	}
+
+	println!("You win player {}", game_state.players.current_player);
 }
 
 enum Action {
@@ -72,7 +76,7 @@ fn read_action_from_stdin<'a>(players:&'a mut Players) -> Action {
 				println!("Card does not exist!");
 				continue;
 			}
-			
+
 			// Minus 1 because humans are 1-indexed
 			let card_index: usize = n - 1 as usize;
 			match players.get_from_current_player(card_index) {
