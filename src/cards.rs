@@ -1,6 +1,9 @@
 extern crate rand;
+extern crate term_painter as term;
 
 use std::fmt;
+
+use self::term::ToStyle;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Card {
@@ -12,11 +15,8 @@ impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use cards::CardType::*;
         match self.card_type {
-            Wild(Color::Any) => return write!(f, "Wild"),
-            Wild(_) => return write!(f, "Wild ({})", self.color),
-            WildPlus4(Color::Any) => return write!(f, "Wild Plus 4"),
-            WildPlus4(_) => return write!(f, "Wild Plus 4 ({})", self.color),
-
+            Wild(x) => return write!(f, "{}", Color::print_in_color("Wild".to_string(), x)),
+            WildPlus4(x) => return write!(f, "{}", Color::print_in_color("Wild Plus 4".to_string(), x)),
             _ => return write!(f, "{} {}", self.color, self.card_type)
         }
     }
@@ -98,14 +98,29 @@ pub enum Color {
     Any,
 }
 
+impl Color {
+    fn print_in_color(string: String, color: self::Color) -> term::Painted<String> {
+        use cards::Color::*;
+        use self::term::Color as T_Color;
+        match color {
+            Green => return T_Color::Green.paint(string),
+            Blue => return T_Color::Blue.paint(string),
+            Red => return T_Color::Red.paint(string),
+            Yellow => return T_Color::Yellow.paint(string),
+            Any =>  return T_Color::White.paint(string),
+        }
+    }
+}
+
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use cards::Color::*;
+        use self::term::Color as T_Color;
         match *self {
-            Green => return write!(f, "Green"),
-            Blue => return write!(f, "Blue"),
-            Red => return write!(f, "Red"),
-            Yellow => return write!(f, "Yellow"),
+            Red => return write!(f, "{}", T_Color::Red.paint("Red")),
+            Green => return write!(f, "{}", T_Color::Green.paint("Green")),
+            Yellow => return write!(f, "{}", T_Color::Yellow.paint("Yellow")),
+            Blue => return write!(f, "{}", T_Color::Blue.paint("Blue")),
             Any => return write!(f, "Any")
         }
     }
