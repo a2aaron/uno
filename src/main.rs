@@ -2,13 +2,15 @@ mod cards;
 mod tests;
 mod game_state;
 
-// extern crate rand;
-
-// use rand::Rand;
+extern crate term_painter as term;
 
 use cards::*;
 use game_state::*;
 use std::io;
+
+use term::ToStyle;
+use term::Color::*;
+use term::Attr::*;
 
 fn main() {
 	let mut num_players: usize = 4;
@@ -37,12 +39,7 @@ fn main() {
 
 	// Main game loop
 	loop {
-		println!("Top card is {}", game_state.top_card());
-		println!("Your turn player {}!", game_state.players.current_player + 1);
-		println!("Your hand");
-		for (i, card) in game_state.players.get_current_player().iter().enumerate() {
-			println!("[{}]: {}", i + 1, card);
-		}
+		print_game_state(&mut game_state);
 		// Get card to play
 		let action: Action = read_action_from_stdin(&mut game_state.players);
 		match action {
@@ -65,6 +62,36 @@ fn main() {
 	}
 
 	println!("You win player {}!", game_state.players.current_player + 1);
+}
+
+fn print_game_state(game_state: &mut GameState) {
+	let top_card: Card = game_state.top_card();
+	println!("Top card is {}", top_card);
+	println!("Your turn player {}!", game_state.players.current_player + 1);
+	println!("Your hand");
+	for (i, card) in game_state.players.get_current_player().iter().enumerate() {
+		println!("[{}]: {}", i + 1, color_if_playable(*card, top_card));
+	}
+}
+
+fn color_if_playable(card: Card, onto: Card) -> term::Painted<String> {
+	if playable_card(card, onto) {
+		return card_to_term_color(card.color).underline().paint(format!("{}", card));
+	} else {
+		return card_to_term_color(card.color).paint(format!("{}", card));
+	}
+}
+
+fn card_to_term_color(color: cards::Color) -> term::Color {
+    use cards::Color::*;
+    use term::Color as T_Color;
+    match color {
+        Green => return T_Color::Green,
+        Blue => return T_Color::Blue,
+        Red => return T_Color::Red,
+        Yellow => return T_Color::Yellow,
+        Any =>  return T_Color::White,
+    }
 }
 
 enum Action {

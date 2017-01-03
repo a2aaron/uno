@@ -13,12 +13,7 @@ pub struct Card {
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use cards::CardType::*;
-        match self.card_type {
-            Wild(x) => return write!(f, "{}", print_in_color("Wild".to_string(), x)),
-            WildPlus4(x) => return write!(f, "{}", print_in_color("Wild Plus 4".to_string(), x)),
-            _ => return write!(f, "{}", print_in_color(format!("{} {}", self.color, self.card_type), self.color)),
-        }
+        return write!(f, "{}", self.colored());
     }
 }
 
@@ -53,6 +48,15 @@ impl Card {
              (_, Number(x)) if (x < 0 ||  x > 9) => return Err("Number cardtype must have value between one and ten"),
              (_, _) => return Ok(Card::new_from_any(color, card_type)),
          }
+    }
+
+    pub fn colored(&self) -> term::Painted<String> {
+        use cards::CardType::*;
+        match self.card_type {
+            Wild(x) => print_in_color("Wild".to_string(), x),
+            WildPlus4(x) => print_in_color("Wild Plus 4".to_string(), x),
+            _ => print_in_color(format!("{} {}", self.color, self.card_type), self.color),
+        }
     }
 }
 
