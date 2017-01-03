@@ -12,7 +12,7 @@ fn main() {
 	let mut num_players: usize = 4;
 	println!("Welcome to Uno!");
 	println!("Type \"start\" to play. Type a number to set number of players (Currently {})", num_players);
-
+	// Preamble/Options
 	loop {
 		let menu_nav: String = read_string_from_stdin(None).to_lowercase();
 		if menu_nav == "start" {

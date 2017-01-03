@@ -2,21 +2,14 @@ extern crate rand;
 
 use std::fmt;
 
+/// A card. This card should satisfy the following properties
+/// 1. If it a wild card, then it's color must be Any
+/// 2. If it is not a wild card, then it's color must not be Any
+/// 3. If it is a number, then it must between 0 and 9 inclusive 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Card {
     pub color: Color,
     pub card_type: CardType,
-}
-
-impl fmt::Display for Card {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use cards::CardType::*;
-        match self.card_type {
-            Wild(_) => write!(f, "Wild"),
-            WildPlus4(_) => write!(f, "Wild Plus 4"),
-            _ => write!(f, "{} {}", self.color, self.card_type),
-        }
-    }
 }
 
 impl Card {
@@ -86,6 +79,19 @@ impl Iterator for Card {
     }
 }
 
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use cards::CardType::*;
+        match self.card_type {
+            Wild(_) => write!(f, "Wild"),
+            WildPlus4(_) => write!(f, "Wild Plus 4"),
+            _ => write!(f, "{} {}", self.color, self.card_type),
+        }
+    }
+}
+
+
+/// The color of a card. If the card is wild, then the color should be `Any`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Color {
     Green,
@@ -108,6 +114,8 @@ impl fmt::Display for Color {
     }
 }
 
+/// A card type, refers to the actual value of the 
+/// the card. Note that Number should be between 0 and 9 inclusive
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CardType {
     Number(i32),

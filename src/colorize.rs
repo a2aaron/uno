@@ -11,11 +11,11 @@ pub fn print_game_state(game_state: &mut GameState) {
 	println!("Your turn player {}!", game_state.players.current_player + 1);
 	println!("Your hand");
 	for (i, card) in game_state.players.get_current_player().iter().enumerate() {
-		println!("[{}]: {}", i + 1, color_if_playable(*card, top_card));
+		println!("[{}]: {}", i + 1, underline_if_playable(*card, top_card));
 	}
 }
 
-pub fn color_if_playable(card: Card, onto: Card) -> term::Painted<String> {
+pub fn underline_if_playable(card: Card, onto: Card) -> term::Painted<String> {
 	if playable_card(card, onto) {
 		return color_card(card).underline().paint(format!("{}", card));
 	} else {
