@@ -76,13 +76,22 @@ fn print_game_state(game_state: &mut GameState) {
 
 fn color_if_playable(card: Card, onto: Card) -> term::Painted<String> {
 	if playable_card(card, onto) {
-		return card_to_term_color(card.color).underline().paint(format!("{}", card));
+		return color_card(card).underline().paint(format!("{}", card));
 	} else {
-		return card_to_term_color(card.color).paint(format!("{}", card));
+		return color_card(card).paint(format!("{}", card));
 	}
 }
 
-fn card_to_term_color(color: cards::Color) -> term::Color {
+fn color_card(card: Card) -> term::Color {
+	use cards::CardType::*;
+	match card.card_type {
+		Wild(x) | WildPlus4(x) => return color_to_term_color(x),
+		_ => return color_to_term_color(card.color),
+	}
+}
+
+
+fn color_to_term_color(color: cards::Color) -> term::Color {
     use cards::Color::*;
     use term::Color as T_Color;
     match color {

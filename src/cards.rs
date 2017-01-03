@@ -1,9 +1,6 @@
 extern crate rand;
-extern crate term_painter as term;
 
 use std::fmt;
-
-use self::term::ToStyle;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Card {
@@ -13,7 +10,12 @@ pub struct Card {
 
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{}", self.colored());
+        use cards::CardType::*;
+        match self.card_type {
+            Wild(_) => write!(f, "Wild"),
+            WildPlus4(_) => write!(f, "Wild Plus 4"),
+            _ => write!(f, "{} {}", self.color, self.card_type),
+        }
     }
 }
 
@@ -48,15 +50,6 @@ impl Card {
              (_, Number(x)) if (x < 0 ||  x > 9) => return Err("Number cardtype must have value between one and ten"),
              (_, _) => return Ok(Card::new_from_any(color, card_type)),
          }
-    }
-
-    pub fn colored(&self) -> term::Painted<String> {
-        use cards::CardType::*;
-        match self.card_type {
-            Wild(x) => print_in_color("Wild".to_string(), x),
-            WildPlus4(x) => print_in_color("Wild Plus 4".to_string(), x),
-            _ => print_in_color(format!("{} {}", self.color, self.card_type), self.color),
-        }
     }
 }
 
@@ -95,35 +88,22 @@ impl Iterator for Card {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Color {
-	Green,
-	Blue,
-	Red,
-	Yellow,
+    Green,
+    Blue,
+    Red,
+    Yellow,
     Any,
-}
-
-fn print_in_color(string: String, color: self::Color) -> term::Painted<String> {
-    use cards::Color::*;
-    use self::term::Color as T_Color;
-    match color {
-        Green => return T_Color::Green.paint(string),
-        Blue => return T_Color::Blue.paint(string),
-        Red => return T_Color::Red.paint(string),
-        Yellow => return T_Color::Yellow.paint(string),
-        Any =>  return T_Color::White.paint(string),
-    }
 }
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use cards::Color::*;
-        use self::term::Color as T_Color;
         match *self {
-            Red => return write!(f, "{}", T_Color::Red.paint("Red")),
-            Green => return write!(f, "{}", T_Color::Green.paint("Green")),
-            Yellow => return write!(f, "{}", T_Color::Yellow.paint("Yellow")),
-            Blue => return write!(f, "{}", T_Color::Blue.paint("Blue")),
-            Any => return write!(f, "Any")
+            Red => write!(f, "Red"),
+            Green => write!(f, "Green"),
+            Yellow => write!(f, "Yellow"),
+            Blue => write!(f, "Blue"),
+            Any => write!(f, "Any"),
         }
     }
 }
