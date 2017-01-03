@@ -202,6 +202,11 @@ impl Players {
     }
 }
 
+pub enum Action {
+    Play(Card, usize),
+    Draw,
+}
+
 /// Returns true if at least one of the following is true:
 /// 1. The color of the card is "Any" (and thus is a Wild card)
 /// 2. The color or card type of the card matches the `onto` card_type
@@ -222,7 +227,6 @@ pub fn playable_card(card: Card, onto: Card) -> bool {
         }
     }
 }
-
 
 /// Returns a Vector of 108 cards containing:
 /// 4 `WildPlus4` cards
