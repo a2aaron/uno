@@ -82,15 +82,8 @@ impl GameState {
                 game_state.players.get_hand(i).push(card);
             }
         }
+        game_state.deal_first_play_card();
 
-        // Make sure top card is not a wild card
-        loop {
-            let card: Card = game_state.pop_draw_deck();
-            game_state.play_deck.push(card);
-            if game_state.top_card().color != Color::Any {
-                break;
-            }
-        }
         game_state
     }
 
@@ -143,12 +136,24 @@ impl GameState {
         return *self.play_deck.last().unwrap();
     }
 
+    fn deal_first_play_card(&mut self) {
+        // Make sure top card is not a wild card
+        loop {
+            let card: Card = self.pop_draw_deck();
+            self.play_deck.push(card);
+            if self.top_card().color != Color::Any {
+                break;
+            }
+        }
+    }
+
     fn refill(&mut self) {
         if self.draw_deck.len() != 0 {
             panic!("Draw deck not empty");
         } 
-
         self.draw_deck.append(&mut self.play_deck);
+        self.deal_first_play_card();
+        println!("Refilled draw deck");
     }
 
     fn shuffle(&mut self) {
