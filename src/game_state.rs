@@ -12,8 +12,8 @@ const STARTING_HAND_SIZE: usize = 7;
 pub struct GameState {
     pub turn_order: TurnOrder,
     pub players: Players,
-    pub draw_deck: Vec<Card>,
-    pub play_deck: Vec<Card>,
+    draw_deck: Vec<Card>,
+    play_deck: Vec<Card>,
 }
 
 impl GameState {
@@ -67,7 +67,7 @@ impl GameState {
     }
 
     /// Goes to the next player (This goes backwards if a reverse is in play)
-    pub fn next_player(&mut self) {
+    fn next_player(&mut self) {
         use self::TurnOrder::*;
         match self.turn_order {
             Normal => self.players.next_player(),
@@ -84,7 +84,7 @@ impl GameState {
     }
 
     /// Get the top card of the `play_deck`. If it's empty then refill it
-    pub fn pop_draw_deck(&mut self) -> Card {
+    fn pop_draw_deck(&mut self) -> Card {
         match self.draw_deck.pop() {
             Some(card) => return card,
             None => {
@@ -161,12 +161,12 @@ pub enum TurnOrder {
 /// Note that at least one player should exist
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Players {
-    pub current_player: usize,
-    pub players: Vec<Vec<Card>>,    
+    pub current_player: usize, // TODO: Remove this pub
+    players: Vec<Vec<Card>>,
 }
 
 impl Players {
-    pub fn new(num_players: usize) -> Players {
+    fn new(num_players: usize) -> Players {
         let players: Vec<Vec<Card>> = vec!(Vec::new(); num_players);
         Players {
             players: players,
@@ -175,7 +175,7 @@ impl Players {
     }
 
     /// Get the nth hand
-    pub fn get_hand(&mut self, index: usize) -> &mut Vec<Card> {
+    fn get_hand(&mut self, index: usize) -> &mut Vec<Card> {
         self.players.get_mut(index).unwrap()
     }
 
@@ -233,7 +233,7 @@ pub fn playable_card(card: Card, onto: Card) -> bool {
 /// 4 `Wild` cards
 /// 2 of each color for Numbers 1 through 9, Reverse, Skip, and Plus2
 /// 1 of each color for Number 0
-pub fn get_deck() -> Vec<Card> {
+fn get_deck() -> Vec<Card> {
     let mut vec: Vec<Card> = Vec::new();
     let mut iter: Card = Card::new();
     loop {
