@@ -47,7 +47,7 @@ impl GameState {
     /// this function panics (Use `playable_card` before to ensure the card may be played)
     pub fn play_card(&mut self, card: &mut Card) -> &mut GameState {
         use cards::CardType::*;
-        if playable_card(*card, self.top_card()) {
+        if playable_card(card, self.top_card()) {
             self.play_deck.push(*card);
             match card.card_type {
                 Reverse => self.reverse(),
@@ -60,10 +60,6 @@ impl GameState {
         } else {
             panic!()
         }
-    }
-
-    pub fn playable_card(&mut self, card: Card) -> bool {
-        return playable_card(card, self.top_card())
     }
 
     /// Goes to the next player (This goes backwards if a reverse is in play)
@@ -79,7 +75,7 @@ impl GameState {
     /// Then, goes to the next player
     pub fn draw_card(&mut self) {
         let card: Card = self.pop_draw_deck();
-        self.players.get_current_player().push(card);
+        self.players.get_current_player_mut().push(card);
         self.next_player();
     }
 
@@ -94,8 +90,8 @@ impl GameState {
         }
     }
 
-    pub fn top_card(&mut self) -> Card {
-        return *self.play_deck.last().unwrap();
+    pub fn top_card(&self) -> &Card {
+        return self.play_deck.last().expect("Expected at least one card in the play_deck");
     }
 
     fn deal_first_play_card(&mut self) {
@@ -130,7 +126,7 @@ impl GameState {
             for _ in 0..num_cards {
                 cards.push(self.pop_draw_deck());
             }
-            let this_hand: &mut Vec<Card> = self.players.get_current_player();
+            let this_hand: &mut Vec<Card> = self.players.get_current_player_mut();
             this_hand.append(&mut cards);
         }
         self.next_player();
@@ -180,13 +176,22 @@ impl Players {
     }
 
     /// Get the current player's hand
-    pub fn get_current_player(&mut self) -> &mut Vec<Card> {
+    pub fn get_current_player(&self) -> &Vec<Card> {
+        self.players.get(self.current_player).unwrap()
+    }
+
+    pub fn get_current_player_mut(&mut self) -> &mut Vec<Card> {
         self.players.get_mut(self.current_player).unwrap()
     }
 
     /// Get the nth card from the current player's hand
-    pub fn get_from_current_player(&mut self, index: usize) -> Option<&mut Card> {
-        self.get_current_player().get_mut(index)
+    pub fn get_from_current_player(&self, index: usize) -> Option<&Card> {
+        self.get_current_player().get(index)
+    }
+
+        /// Get the nth card from the current player's hand
+    pub fn get_from_current_player_mut(&mut self, index: usize) -> Option<&mut Card> {
+        self.get_current_player_mut().get_mut(index)
     }
 
     fn next_player(&mut self) {
@@ -211,7 +216,7 @@ pub enum Action {
 /// 1. The color of the card is "Any" (and thus is a Wild card)
 /// 2. The color or card type of the card matches the `onto` card_type
 /// 3. The color of the card matches the onto card (if the onto card is a Wild)
-pub fn playable_card(card: Card, onto: Card) -> bool {
+pub fn playable_card(card: &Card, onto: &Card) -> bool {
     use cards::Color::*;
     use cards::CardType::*;
     if card.color == Any {

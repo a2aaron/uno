@@ -31,7 +31,7 @@ pub fn read_action_from_stdin<'a>(players:&'a mut Players) -> Action {
 
 			// Minus 1 because humans are 1-indexed
 			let card_index: usize = n - 1 as usize;
-			match players.get_from_current_player(card_index) {
+			match players.get_from_current_player_mut(card_index) {
 				None => println!("Card does not exist!"),
 				Some(x) => {
 					// If wild, ask for color

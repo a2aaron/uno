@@ -35,13 +35,13 @@ fn main() {
 
 	// Main game loop
 	loop {
-		colorize::print_game_state(&mut game_state);
+		colorize::print_game_state(&game_state);
 		// Get card to play
 		let action: Action = read_action_from_stdin(&mut game_state.players);
 		match action {
 			Action::Play(mut card, index) => {
-				if game_state.playable_card(card) {
-					game_state.players.get_current_player().remove(index);
+				if playable_card(&card, game_state.top_card()) {
+					game_state.players.get_current_player_mut().remove(index);
 					if game_state.players.get_current_player().len() == 0 {
 						break;
 					}
